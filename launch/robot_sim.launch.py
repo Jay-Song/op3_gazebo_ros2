@@ -18,11 +18,10 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default=True)
 
     # find op3 packages
-    op3_description_path = os.path.join(
-        get_package_share_directory('op3_description'))
-    
-    op3_gazebo_path = os.path.join(
-        get_package_share_directory('op3_gazebo_ros2'))
+    op3_description_path = os.path.join(get_package_share_directory('op3_description'))
+    xacro_file = os.path.join(op3_description_path, 'urdf', 'robotis_op3.urdf.xacro')
+
+    op3_gazebo_path = os.path.join(get_package_share_directory('op3_gazebo_ros2'))
 
     # Set gazebo sim resource path
     gazebo_resource_path = SetEnvironmentVariable(
@@ -51,12 +50,7 @@ def generate_launch_description():
                 ]
              )
 
-    xacro_file = os.path.join(op3_description_path,
-                              'urdf',
-                              'robotis_op3.urdf.xacro')
-
     doc = xacro.process_file(xacro_file, mappings={'use_sim' : 'true'})
-
     robot_desc = doc.toprettyxml(indent='  ')
 
     params = {'robot_description': robot_desc}
@@ -75,7 +69,7 @@ def generate_launch_description():
         arguments=['-string', robot_desc,
                    '-x', '0.0', 
                    '-y', '0.0',
-                   '-z', '0.336',
+                   '-z', '0.285',
                    '-R', '0.0',
                    '-P', '0.0',
                    '-Y', '0.0',
@@ -91,18 +85,20 @@ def generate_launch_description():
 
     load_forward_position_controller = ExecuteProcess(
         cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'forward_position_controller'],
+             'robotis_op3_position'],
         output='screen'
     )
 
-    # Bridge
-    # bridge = Node(
-    #     package='ros_gz_bridge',
-    #     executable='parameter_bridge',
-    #     arguments=['/scan@sensor_msgs/msg/LaserScan@gz.msgs.LaserScan'],
-    #     output='screen'
-    # )
-
+    bridge_params = os.path.join(op3_gazebo_path,'config','bridge_parameters.yaml')
+    ros_gz_bridge = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        arguments=[
+            '--ros-args',
+            '-p',
+            f'config_file:={bridge_params}',
+        ]
+    )
     # rviz_config_file = os.path.join(op3_description_path, 'config', 'fws_robot_config.rviz')
 
     # rviz = Node(
@@ -131,6 +127,6 @@ def generate_launch_description():
         gazebo,
         node_robot_state_publisher,
         gz_spawn_entity,
-        # bridge,
+        ros_gz_bridge,
         # rviz,
     ])

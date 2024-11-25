@@ -5,10 +5,10 @@ controller_manager:
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
-    forward_position_controller:
+    robotis_op3_position:
       type: forward_command_controller/ForwardCommandController
 
-forward_position_controller:
+robotis_op3_position:
   ros__parameters:
     joints:
       - r_sho_pitch
