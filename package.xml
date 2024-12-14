@@ -3,7 +3,7 @@
 <package format="3">
   <name>op3_gazebo_ros2</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>op3_gazebo</description>
   <maintainer email="sguswhd21@gmail.com">jay</maintainer>
   <license>TODO: License declaration</license>
 
