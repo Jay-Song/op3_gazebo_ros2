@@ -187,11 +187,15 @@
       </plugin>
     </gazebo>
 
-    <!-- For Gazebo Control -->
+    <!-- For Gazebo Control and Sensors -->
     <gazebo>
       <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
         <parameters>$(find op3_gazebo_ros2)/config/robotis_op3_gazebo_config.yaml</parameters>
       </plugin>
+      <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+        <render_engine>ogre2</render_engine>
+      </plugin>
+      <plugin filename="gz-sim-imu-system" name="gz::sim::systems::Imu"/>
     </gazebo>
 
     <!-- For Ros2 Control -->
@@ -439,6 +443,44 @@
         <state_interface name="effort"/>
       </joint>
     </ros2_control>
+
+    <gazebo reference="cam_gazebo_link">
+      <sensor name='camera' type='camera'>
+        <gz_frame_id>cam_gazebo_link</gz_frame_id>
+        <camera name='__default__'>
+          <horizontal_fov>1.012300</horizontal_fov>
+          <image>
+            <width>320</width>
+            <height>200</height>
+          </image>
+          <clip>
+            <near>0.001000</near>
+            <far>100.000000</far>
+          </clip>
+          <camera_info_topic>camera_info</camera_info_topic>
+          <frame_id>/cam_gazebo_link</frame_id>
+        </camera>
+        <alwaysOn>ture</alwaysOn>
+        <visualize>true</visualize>
+        <update_rate>30.000000</update_rate>
+        <topic>image_raw</topic>
+      </sensor>
+    </gazebo>
+
+    <gazebo reference="body_link">
+      <sensor name="imu" type="imu">
+        <gz_frame_id>body_link</gz_frame_id>
+        <imu>
+          <enable_metrics>true</enable_metrics>
+          <frame_id>/cam_gazebo_link</frame_id>
+        </imu>
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <update_rate>50.0</update_rate>
+        <topic>imu</topic>
+      </sensor>
+    </gazebo>
+  
 
   </xacro:macro>
 
