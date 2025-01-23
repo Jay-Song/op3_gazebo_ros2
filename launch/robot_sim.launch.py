@@ -8,7 +8,7 @@ from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchD
 from launch.actions import RegisterEventHandler, SetEnvironmentVariable
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
@@ -77,6 +77,16 @@ def generate_launch_description():
                    '-allow_renaming', 'false'],
     )
 
+    rf_gz_bridge_pkg_path = FindPackageShare('rf_gz_bridge')
+    op3_joint_list_path = PathJoinSubstitution([rf_gz_bridge_pkg_path, 'config', 'op3_joint_list.yaml'])
+    
+    rf_gz_bridge = Node(
+        package='rf_gz_bridge',
+        executable='rf_gz_bridge_node',
+        output='screen',
+        parameters=[{'joint_list_path': op3_joint_list_path}]
+    )
+
     load_joint_state_controller = ExecuteProcess(
         cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
              'joint_state_broadcaster'],
@@ -128,5 +138,6 @@ def generate_launch_description():
         node_robot_state_publisher,
         gz_spawn_entity,
         ros_gz_bridge,
+        rf_gz_bridge
         # rviz,
     ])
